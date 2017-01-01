@@ -15,9 +15,13 @@ setup(name='pakalolo',
       url='https://github.com/misaakidis/pakalolo',
       license=license,
       packages=['pakalolo'],
+      include_package_data=True,
+      install_requires=[
+          'Click',
+      ],
       entry_points={
           'console_scripts': [
-              'pakalolo = pakalolo.__main__:main'
+              'pakalolo = pakalolo.__main__:cli'
           ]
       }
       )

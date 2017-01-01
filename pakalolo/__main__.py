@@ -2,14 +2,22 @@ import click
 import os
 import sys
 import gnupg
+from pakalolo import __version__
 
 gpg = None
 
-@click.command()
-@click.option('--homedir', default=None, envvar='PAKALOLOHOME', help="set the directory to store the pakalolo keyring (default is ~/.pakalolo/)")
-def main(homedir):
+@click.group()
+@click.option('--homedir', default=None, envvar='PAKALOLOHOME', type=click.Path(exists=False),
+              help="set the directory to store the pakalolo keyring(default is ~/.pakalolo/)")
+def cli(homedir):
     """pakalolo key management tool"""
     open_keying(homedir)
+
+
+@cli.command()
+def version():
+    """print program version"""
+    sys.exit('pakalolo ' + __version__)
 
 
 def open_keying(homedir=None):
@@ -28,4 +36,4 @@ def open_keying(homedir=None):
 
 
 if __name__ == "__main__":
-    main()
+    cli()
