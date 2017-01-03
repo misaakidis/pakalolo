@@ -9,6 +9,7 @@ from pakalolo import __version__
 gpg = None
 storedir = None
 claimchain = None
+chain_updated = False
 
 
 @click.group(invoke_without_command=True)
@@ -19,9 +20,14 @@ def cli(homedir):
     open_keying(homedir)
     global claimchain
     claimchain = load_chain('pakalolo')
+    if claimchain is None:
+        if click.confirm("No claimchain was found in directory " + storedir +
+                                 ", would you like to create one?", abort=True):
+            claimchain = first_run()
     if claimchain.store.__len__() == 0:
-        first_run()
-    if click.confirm('Do you want to save your changes?', abort=True):
+        if click.confirm("Your claimchain contains no keys, would you like to create one?", abort=True):
+            claimchain = first_run()
+    if chain_updated and click.confirm('Do you want to save your changes?', abort=True):
         store_chain('pakalolo')
 
 
@@ -33,9 +39,13 @@ def version():
 
 def first_run():
     print "Welcome to pakalolo"
+    print "generating your first key..."
     alice_key = gen_key()
-    global claimchain
+    claimchain = hippiehug.Chain()
     claimchain.multi_add([alice_key.fingerprint])
+    global chain_updated
+    chain_updated = True
+    return claimchain
 
 
 def open_keying(homedir=None):
@@ -75,24 +85,26 @@ def store_chain(store_file):
     """Save the claimchaine store in the homedir"""
     save_pickle(claimchain.store, '/' + store_file)
 
+
 def load_chain(store_file):
     """
     Restore a claimchain from a saved store
 
-    :return: A claimchain instance with the items from the saved store, or an empty claimchain if the store does
-            not exist or cannot be read.
+    :return: A claimchain instance with the items from the saved store, or None if the store does
+            not exist or cannot be loaded.
     """
     try:
         store = load_pickle(store_file)
         claimchain = hippiehug.Chain(store)
     except:
-        claimchain = hippiehug.Chain()
+        return None
     return claimchain
 
 
 def save_pickle(obj, name):
     with open(storedir+ name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
 
 def load_pickle(name):
     with open(storedir + name + '.pkl', 'rb') as f:
