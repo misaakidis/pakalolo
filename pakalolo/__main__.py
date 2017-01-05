@@ -2,13 +2,12 @@ import click
 import os
 import sys
 import gnupg
-import hippiehug
 import pickle
-from pakalolo import __version__
+from pakalolo import claimchain, __version__
 
 gpg = None
 storedir = None
-claimchain = None
+chain = None
 chain_updated = False
 
 
@@ -18,15 +17,15 @@ chain_updated = False
 def cli(homedir):
     """pakalolo key management tool"""
     open_keying(homedir)
-    global claimchain
-    claimchain = load_chain('pakalolo')
-    if claimchain is None:
+    global chain
+    chain = load_chain('pakalolo')
+    if chain is None:
         if click.confirm("No claimchain was found in directory " + storedir +
                                  ", would you like to create one?", abort=True):
-            claimchain = first_run()
-    if claimchain.store.__len__() == 0:
+            chain = first_run()
+    if len(chain.store) == 0:
         if click.confirm("Your claimchain contains no keys, would you like to create one?", abort=True):
-            claimchain = first_run()
+            chain = first_run()
     if chain_updated and click.confirm('Do you want to save your changes?', abort=True):
         store_chain('pakalolo')
 
@@ -41,11 +40,11 @@ def first_run():
     print "Welcome to pakalolo"
     print "generating your first key..."
     alice_key = gen_key()
-    claimchain = hippiehug.Chain()
-    claimchain.multi_add([alice_key.fingerprint])
+    chain = claimchain.Chain()
+    chain.multi_add([alice_key.fingerprint])
     global chain_updated
     chain_updated = True
-    return claimchain
+    return chain
 
 
 def open_keying(homedir=None):
@@ -83,7 +82,7 @@ def gen_key():
 
 def store_chain(store_file):
     """Save the claimchaine store in the homedir"""
-    save_pickle(claimchain.store, '/' + store_file)
+    save_pickle(chain.store, '/' + store_file)
 
 
 def load_chain(store_file):
@@ -95,19 +94,21 @@ def load_chain(store_file):
     """
     try:
         store = load_pickle(store_file)
-        claimchain = hippiehug.Chain(store)
+        chain = claimchain.Chain(store)
     except:
         return None
-    return claimchain
+    return chain
 
 
 def save_pickle(obj, name):
-    with open(storedir+ name + '.pkl', 'wb') as f:
+    path = os.path.join(storedir + name + '.pkl')
+    with open(path, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
 
 def load_pickle(name):
-    with open(storedir + name + '.pkl', 'rb') as f:
+    path = os.path.join(storedir + name + '.pkl')
+    with open(path, 'rb') as f:
         return pickle.load(f)
 
 
