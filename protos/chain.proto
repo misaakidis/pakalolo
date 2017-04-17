@@ -31,6 +31,14 @@ message Claim {
 }
 
 
+// Single private claim along with commitment openings.
+message PrivateClaimWrapper {
+  Claim claim = 1;
+  bytes label_commit_opening_secret = 2;
+  bytes claim_commit_opening_secret = 3;
+}
+
+
 message CapabilityList {
   repeated Claim.Label labels = 1;
 }
@@ -57,6 +65,20 @@ message Block {
     Claim claim = 2;
   }
 
+  // Format for publishing private claim encryptions to multiple readers.
+  message Envelope {
+    // One-time symmetric key sk, encrypted-and-MAC'd for all particular reader.
+    // The MAC is common for all readers; it is stored in sk_digest field.
+    repeated bytes sk_encryptions = 1;
+    string sk_digest = 2;
+
+    // Hash digest of an encrypted PrivateClaimWrapper.
+    string private_claim_wrapper_digest = 3;
+
+    // Commitment to the claim inside the PrivateClaimWrapper.
+    string claim_commitment = 4;
+  }
+
   // Wrapper for everything on the block that is signed.
   message BlockPayload {
     uint32 block_index = 1;
@@ -75,10 +97,10 @@ message Block {
     // Hash digest of the soundness proof of the non-equivocation Merkle tree.
     string non_equivocation_ext_proof_digest = 7;
 
-    // Map from claim commitments to digests of claim envelopes
-    map<string, string> private_envelopes_map = 8;
     // Map from reader identifiers to digests of encrypted capability lists
-    map<string, string> capabilities_map = 9;
+    map<string, string> capabilities_map = 8;
+    // Map from claim commitments to claim envelopes
+    map<string, Envelope> envelopes_map = 9;
   }
 
   BlockPayload payload = 1;
@@ -86,27 +108,7 @@ message Block {
 }
 
 
-// Format for publishing private claim encryptions to multiple readers.
-message Envelope {
-  // One-time symmetric key sk, encrypted-and-MAC'd for all particular reader.
-  // The MAC is common for all readers; it is stored in sk_digest field.
-  repeated bytes sk_encryptions = 1;
-  bytes sk_digest = 2;
 
-  // Encryption of a PrivateClaimWrapper.
-  bytes encrypted_claim_wrapper = 3;
-
-  // Commitment to the claim inside the PrivateClaimWrapper.
-  string claim_commitment = 4;
-}
-
-
-// Single private claim along with commitment openings.
-message PrivateClaimWrapper {
-  Claim claim = 1;
-  bytes label_commit_opening_secret = 2;
-  bytes claim_commit_opening_secret = 3;
-}
 
 
 
