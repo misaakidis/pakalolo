@@ -34,7 +34,7 @@ message Claim {
 // Single private claim along with commitment openings.
 message PrivateClaimWrapper {
   Claim claim = 1;
-  bytes label_commit_opening_secret = 2;
+  bytes next_lookup_key_opening_secret = 2;
   bytes claim_commit_opening_secret = 3;
 }
 
