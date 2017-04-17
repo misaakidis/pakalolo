@@ -15,7 +15,15 @@ PROTOC=~/.local/bin/protoc
 .PHONY: protos protoc deps clean
 
 ## Dependencies
-deps: protoc
+deps: protoc python
+
+python_system:
+	apt-get install python3 python-virtualenv
+
+python: python_system
+	virtualenv venv --python=python3
+	. venv/bin/activate
+	venv/bin/pip install -r requirements.txt
 
 # Install protoc v3
 protoc: /tmp/$(PROTOC_ARCHIVE)
@@ -24,7 +32,7 @@ protoc: /tmp/$(PROTOC_ARCHIVE)
 	unzip /tmp/$(PROTOC_ARCHIVE) -d $(PROTOC_INSTALL_PATH)
 	-rm $(PROTOC)
 	ln -s $(PROTOC_INSTALL_PATH)/bin/protoc $(PROTOC)
-	chmod +x $(PROTOC_INSTALL_PATH)/bin/protoc
+	chmod a+r+x $(PROTOC_INSTALL_PATH) -R
 
 /tmp/$(PROTOC_ARCHIVE):
 	curl -OL https://github.com/google/protobuf/releases/download/v$(PROTOC_VERSION)/$(PROTOC_ARCHIVE)
@@ -37,4 +45,3 @@ protos:
 
 clean:
 	rm /tmp/$(PROTOC_ARCHIVE)
-
