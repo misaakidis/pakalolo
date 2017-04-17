@@ -1,0 +1,103 @@
+package claimchain;
+
+// TODO: Make all required fields optional before launching --
+// for backwards-compatibility of existing protos
+
+
+message Block {
+  // Reference to a block on the chain.
+  message BlockReference {
+    required uint32 block_index = 1;
+    required bytes block_digest = 2;
+  }
+
+  // Reference to a log entry.
+  message EntryReference {
+    required uint32 block_index = 1;
+    required uint32 entry_index = 2;
+    optional bytes entry_digest = 3;
+  }
+
+  // Claim label name and commitment.
+  message Label {
+    required string name = 1;
+    optional bytes unique_sig_commitment = 2;
+  }
+
+  message Claim {
+    enum ClaimType {
+      APPDATA = 0;
+      METADATA = 1;
+      CROSSREF = 2;
+      PRIVATE_CLAIM_COMMITMENT = 3;
+    }
+
+    optional ClaimType type = 1;
+    required string content = 2;
+    repeated Label labels = 3;
+
+    // Reference to the public log entry of the previous version
+    // of the claim.
+    optional EntryReference prev = 4;
+  }
+
+  // Entry in the public claim log.
+  message LogEntry {
+    // List of tree lookup keys for the claim
+    repeated string lookup_keys = 1;
+    required Claim claim = 2;
+  }
+
+  // Wrapper for everything on the block that is signed.
+  message BlockPayload {
+    required uint32 block_index = 1;
+
+    // Log of public claims.
+    repeated LogEntry public_log = 2;
+    // References to previous blocks.
+    repeated BlockReference back_references = 3;
+    // Reference to the metadata claim.
+    optional EntryReference metadata = 4;
+
+    // Hash digest of the non-equivocation map (or hash digest
+    // of the Merkle tree root).
+    optional bytes non_equivocation_map_digest = 5;
+    // Hash digest of the soundness proof of the non-equivocation Merkle tree.
+    optional bytes non_equivocation_ext_proof_digest = 6;
+    // Hash digest of the private envelopes set.
+    optional bytes private_envelopes_bag_digest = 7;
+  }
+
+  required BlockPayload payload = 1;
+  optional bytes sig = 2;
+}
+
+
+// Format for publishing private claim encryptions to multiple readers.
+message Envelope {
+  // One-time symmetric key sk, encrypted-and-MAC'd for a particular reader.
+  // The MAC is common for all readers; it is sotred in sk_digest field.
+  message EncryptedKeyWrapper {
+    required bytes encrypted_sk = 1;
+
+    // Identifier that helps the reader to find their encryption of sk.
+    optional bytes reader_anchor = 3;
+  }
+
+  repeated EncryptedKeyWrapper sk_encryptions = 1;
+  optional bytes sk_digest = 2;
+
+  // Encryption of a PrivateClaimWrapper.
+  required bytes encrypted_claim_wrapper = 3;
+
+  // Commitment to the claim inside the PrivateClaimWrapper.
+  optional bytes claim_commitment = 4;
+}
+
+
+// Single private claim along with commitment openings.
+message PrivateClaimWrapper {
+  required Block.Claim claim = 1;
+  optional bytes label_commit_opening_secret = 2;
+  optional bytes claim_commit_opening_secret = 3;
+}
