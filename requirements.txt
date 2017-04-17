@@ -10,7 +10,7 @@ packaging==16.8
 Paver==1.2.4
 petlib==0.0.40
 pkg-resources==0.0.0
-protobuf3==0.2.1
+protobuf==3.2.0
 psutil==5.2.2
 py==1.4.33
 pycparser==2.17
