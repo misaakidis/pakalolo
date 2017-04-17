@@ -6,6 +6,36 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 
 
+message Claim {
+  enum ClaimType {
+    APPDATA = 0;
+    METADATA = 1;
+    CROSSREF = 2;
+    REVOCATION = 3;
+    PRIVATE_CLAIM_COMMITMENT = 4;
+  }
+
+  // Claim label name and unique signature
+  message Label {
+    string name = 1;
+    bytes unique_sig = 2;
+  }
+
+  ClaimType type = 1;
+  google.protobuf.Struct content = 2;
+  repeated Label labels = 3;
+
+  // Reference to the public log entry of the previous version
+  // of the claim.
+  Block.EntryReference prev = 4;
+}
+
+
+message CapabilityList {
+  repeated Claim.Label labels = 1;
+}
+
+
 message Block {
   // Reference to a block on the chain.
   message BlockReference {
@@ -20,29 +50,6 @@ message Block {
     bytes entry_digest = 3;
   }
 
-  // Claim label name and unique signature
-  message Label {
-    string name = 1;
-    bytes unique_sig = 2;
-  }
-
-  message Claim {
-    enum ClaimType {
-      APPDATA = 0;
-      METADATA = 1;
-      CROSSREF = 2;
-      REVOCATION = 3;
-      PRIVATE_CLAIM_COMMITMENT = 4;
-    }
-
-    ClaimType type = 1;
-    google.protobuf.Struct content = 2;
-    repeated Label labels = 3;
-
-    // Reference to the public log entry of the previous version
-    // of the claim.
-    EntryReference prev = 4;
-  }
 
   // Entry in the public claim log.
   message LogEntry {
@@ -51,9 +58,6 @@ message Block {
     Claim claim = 2;
   }
 
-  message CapabilityList {
-    repeated Label labels = 1;
-  }
 
   // Wrapper for everything on the block that is signed.
   message BlockPayload {
@@ -101,7 +105,7 @@ message Envelope {
 
 // Single private claim along with commitment openings.
 message PrivateClaimWrapper {
-  Block.Claim claim = 1;
+  Claim claim = 1;
   bytes label_commit_opening_secret = 2;
   bytes claim_commit_opening_secret = 3;
 }
