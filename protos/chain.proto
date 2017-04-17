@@ -3,6 +3,7 @@ syntax = "proto3";
 package claimchain;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 
 message Block {
@@ -19,10 +20,10 @@ message Block {
     bytes entry_digest = 3;
   }
 
-  // Claim label name and commitment.
+  // Claim label name and unique signature
   message Label {
     string name = 1;
-    bytes unique_sig_commitment = 2;
+    bytes unique_sig = 2;
   }
 
   message Claim {
@@ -30,11 +31,12 @@ message Block {
       APPDATA = 0;
       METADATA = 1;
       CROSSREF = 2;
-      PRIVATE_CLAIM_COMMITMENT = 3;
+      REVOCATION = 3;
+      PRIVATE_CLAIM_COMMITMENT = 4;
     }
 
     ClaimType type = 1;
-    string content = 2;
+    google.protobuf.Struct content = 2;
     repeated Label labels = 3;
 
     // Reference to the public log entry of the previous version
@@ -44,10 +46,13 @@ message Block {
 
   // Entry in the public claim log.
   message LogEntry {
-    // List of tree lookup keys for the claim
+    // List of tree lookup keys on the non-equivocation map for the claim.
     repeated string lookup_keys = 1;
     Claim claim = 2;
-    google.protobuf.Timestamp timestamp = 3;
+  }
+
+  message CapabilityList {
+    repeated Label labels = 1;
   }
 
   // Wrapper for everything on the block that is signed.
@@ -64,11 +69,14 @@ message Block {
 
     // Hash digest of the non-equivocation map (or hash digest
     // of the Merkle tree root).
-    bytes non_equivocation_map_digest = 6;
+    string non_equivocation_map_digest = 6;
     // Hash digest of the soundness proof of the non-equivocation Merkle tree.
-    bytes non_equivocation_ext_proof_digest = 7;
-    // Hash digest of the private envelopes set.
-    bytes private_envelopes_bag_digest = 8;
+    string non_equivocation_ext_proof_digest = 7;
+
+    // Map from claim commitments to digests of claim envelopes
+    map<string, string> private_envelopes_map = 8;
+    // Map from reader identifiers to digests of encrypted capability lists
+    map<string, string> capabilities_map = 9;
   }
 
   BlockPayload payload = 1;
@@ -78,23 +86,16 @@ message Block {
 
 // Format for publishing private claim encryptions to multiple readers.
 message Envelope {
-  // One-time symmetric key sk, encrypted-and-MAC'd for a particular reader.
-  // The MAC is common for all readers; it is sotred in sk_digest field.
-  message EncryptedKeyWrapper {
-    bytes encrypted_sk = 1;
-
-    // Identifier that helps the reader to find their encryption of sk.
-    bytes reader_anchor = 3;
-  }
-
-  repeated EncryptedKeyWrapper sk_encryptions = 1;
+  // One-time symmetric key sk, encrypted-and-MAC'd for all particular reader.
+  // The MAC is common for all readers; it is stored in sk_digest field.
+  repeated bytes sk_encryptions = 1;
   bytes sk_digest = 2;
 
   // Encryption of a PrivateClaimWrapper.
   bytes encrypted_claim_wrapper = 3;
 
   // Commitment to the claim inside the PrivateClaimWrapper.
-  bytes claim_commitment = 4;
+  string claim_commitment = 4;
 }
 
 
@@ -104,3 +105,6 @@ message PrivateClaimWrapper {
   bytes label_commit_opening_secret = 2;
   bytes claim_commit_opening_secret = 3;
 }
+
+
+
