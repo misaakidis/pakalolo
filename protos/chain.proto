@@ -50,14 +50,12 @@ message Block {
     bytes entry_digest = 3;
   }
 
-
   // Entry in the public claim log.
   message LogEntry {
     // List of tree lookup keys on the non-equivocation map for the claim.
     repeated string lookup_keys = 1;
     Claim claim = 2;
   }
-
 
   // Wrapper for everything on the block that is signed.
   message BlockPayload {
