@@ -107,8 +107,3 @@ message Block {
   bytes sig = 2;
 }
 
-
-
-
-
-
