@@ -67,16 +67,16 @@ message Block {
 
   // Format for publishing private claim encryptions to multiple readers.
   message Envelope {
-    // One-time symmetric key sk, encrypted-and-MAC'd for all particular reader.
-    // The MAC is common for all readers; it is stored in sk_digest field.
+    // One-time symmetric key sk, encrypted for all readers.
     repeated bytes sk_encryptions = 1;
     string sk_digest = 2;
 
     // Hash digest of an encrypted PrivateClaimWrapper.
-    string private_claim_wrapper_digest = 3;
+    string encrypted_claim_wrapper_digest = 3;
 
     // Commitment to the claim inside the PrivateClaimWrapper.
-    string claim_commitment = 4;
+    // Not needed since the commitment is the key in the envelopes_map
+    // string claim_commitment = 4;
   }
 
   // Wrapper for everything on the block that is signed.
@@ -97,9 +97,9 @@ message Block {
     // Hash digest of the soundness proof of the non-equivocation Merkle tree.
     string non_equivocation_ext_proof_digest = 7;
 
-    // Map from reader identifiers to digests of encrypted capability lists
+    // Map from reader identifiers to digests of encrypted capability lists.
     map<string, string> capabilities_map = 8;
-    // Map from claim commitments to claim envelopes
+    // Map from claim commitments to private claim envelopes.
     map<string, Envelope> envelopes_map = 9;
   }
 
