@@ -17,10 +17,7 @@ PROTOC=~/.local/bin/protoc
 ## Dependencies
 deps: protoc python
 
-python_system:
-	apt-get install python3 python-virtualenv
-
-python: python_system
+python:
 	virtualenv venv --python=python3
 	. venv/bin/activate
 	venv/bin/pip install -r requirements.txt
