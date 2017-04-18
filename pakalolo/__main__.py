@@ -32,8 +32,8 @@ def version():
 
 
 def first_run(gpg):
-    print "Welcome to pakalolo"
-    print "generating your first key..."
+    print("Welcome to pakalolo")
+    print("generating your first key...")
     alice_key = gen_key(gpg)
     chain = claimchain.Chain()
     chain.multi_add([alice_key.fingerprint])
