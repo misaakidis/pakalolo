@@ -18,9 +18,9 @@ PROTOC=~/.local/bin/protoc
 deps: protoc python
 
 python:
-	virtualenv venv --python=python3
-	. venv/bin/activate
-	venv/bin/pip install -r requirements.txt
+	virtualenv $(CWD)/venv --python=python3
+	. $(CWD)/venv/bin/activate
+	$(CWD)/venv/bin/pip install -r requirements.txt
 
 # Install protoc v3
 protoc: /tmp/$(PROTOC_ARCHIVE)
@@ -41,4 +41,7 @@ protos:
 	$(PROTOC) --proto_path=$(PROTO_PATH) --python_out=pakalolo $(PROTOS)
 
 clean:
-	rm /tmp/$(PROTOC_ARCHIVE)
+	-rm /tmp/$(PROTOC_ARCHIVE)
+	-rm $(PROTOC)
+	-rm -rf $(PROTOC_INSTALL_PATH)
+	-rm venv
