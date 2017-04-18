@@ -9,13 +9,14 @@ PROTOS=$(wildcard $(PROTO_PATH)/*.proto)
 VENDOR_PATH=$(CWD)/vendor
 VENDOR_BIN=$(VENDOR_PATH)/bin
 VENDOR_LIB=$(VENDOR_PATH)/lib
+VENV=venv
 
 # Protobuf compiler
 PROTOC_VERSION=3.2.0
 PROTOC_ARCHIVE=protoc-$(PROTOC_VERSION)-$(PLATFORM).zip
 
 
-.PHONY: protos protoc vendor deps clean
+.PHONY: protos protoc vendor deps clean hippiehug
 
 ## Dependencies
 deps: vendor protoc python
@@ -25,9 +26,9 @@ vendor:
 	mkdir -p $(VENDOR_LIB)
 
 python:
-	virtualenv $(CWD)/venv --python=python3
-	. $(CWD)/venv/bin/activate
-	$(CWD)/venv/bin/pip install -r requirements.txt
+	virtualenv $(VENV) --python=python3
+	. $(VENV)/bin/activate
+	$(VENV)/bin/pip install -r requirements.txt
 
 # Install protoc v3
 protoc: /tmp/$(PROTOC_ARCHIVE)
@@ -47,4 +48,9 @@ protos:
 clean:
 	-rm /tmp/$(PROTOC_ARCHIVE)
 	-rm -rf $(VENDOR_PATH)
-	-rm -rf venv
+	-rm -rf $(VENV)
+
+hippiehug:
+	. $(VENV)/bin/activate
+	$(VENV)/bin/pip install -e "git+https://git@github.com/bogdan-kulynych/rousseau-chain.git#egg=hippiehug&subdirectory=hippiehug-package"
+	$(VENV)/bin/pip freeze > requirements.txt
