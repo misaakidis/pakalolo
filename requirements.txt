@@ -1,21 +1,16 @@
 appdirs==1.4.3
 attrs==16.3.0
-cffi==1.10.0
 click==6.7
-coverage==4.3.4
 future==0.16.0
-gnupg===2.2.0-7-gbb9c88a
+-e git+https://github.com/misaakidis/python-gnupg.git@bb9c88ab9560eb4a31dbbd7ff8971e370d6b6128#egg=gnupg
+-e git+https://git@github.com/bogdan-kulynych/rousseau-chain.git@965de1765bc46cf38e51a66891dc49489e11b280#egg=hippiehug&subdirectory=hippiehug-package
 msgpack-python==0.4.8
 packaging==16.8
-Paver==1.2.4
-petlib==0.0.40
 pkg-resources==0.0.0
 protobuf==3.2.0
 psutil==5.2.2
 py==1.4.33
-pycparser==2.17
 pyparsing==2.2.0
 pytest==3.0.7
-pytest-cov==2.4.0
 redis==2.10.5
 six==1.10.0
