@@ -23,11 +23,11 @@ message Claim {
 
   ClaimType type = 1;
   google.protobuf.Struct content = 2;
-  repeated Label labels = 3;
+  Label label = 3;
 
   // Reference to the public log entry of the previous version
   // of the claim.
-  Block.EntryReference prev = 4;
+  Block.ClaimReference prev = 4;
 }
 
 
@@ -52,17 +52,10 @@ message Block {
   }
 
   // Reference to a log entry.
-  message EntryReference {
+  message ClaimReference {
     uint32 block_index = 1;
-    uint32 entry_index = 2;
-    bytes entry_digest = 3;
-  }
-
-  // Entry in the public claim log.
-  message LogEntry {
-    // List of tree lookup keys on the non-equivocation map for the claim.
-    repeated string lookup_keys = 1;
-    Claim claim = 2;
+    uint32 claim_index = 2;
+    bytes claim_digest = 3;
   }
 
   // Format for publishing private claim encryptions to multiple readers.
@@ -73,10 +66,6 @@ message Block {
 
     // Hash digest of an encrypted PrivateClaimWrapper.
     string encrypted_claim_wrapper_digest = 3;
-
-    // Commitment to the claim inside the PrivateClaimWrapper.
-    // Not needed since the commitment is the key in the envelopes_map
-    // string claim_commitment = 4;
   }
 
   // Wrapper for everything on the block that is signed.
@@ -84,11 +73,11 @@ message Block {
     uint32 block_index = 1;
 
     // Log of public claims.
-    repeated LogEntry public_log = 2;
+    repeated Claim public_log = 2;
     // References to previous blocks.
     repeated BlockReference back_references = 3;
     // Reference to the metadata claim.
-    EntryReference metadata = 4;
+    ClaimReference metadata = 4;
     google.protobuf.Timestamp timestamp = 5;
 
     // Hash digest of the non-equivocation map (or hash digest
