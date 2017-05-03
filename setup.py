@@ -8,10 +8,10 @@ with open('LICENSE') as f:
 
 setup(name='pakalolo',
       version='0.0.1',
-      description='A Public Key Infrastructure based on cross-referenced blockchains',
+      description='A Public Key Infrastructure based on cross-referenced hashchains',
       long_description=readme,
-      author='Marios Isaakidis',
-      author_email='prometheas@autistici.org',
+      author='Marios Isaakidis, Bogdan Kulynych',
+      author_email='prometheas@autistici.org, bogdan.kulynych@gmail.com',
       url='https://github.com/misaakidis/pakalolo',
       license=license,
       packages=['pakalolo'],
