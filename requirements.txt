@@ -14,4 +14,4 @@ pyparsing==2.2.0
 pytest==3.0.7
 redis==2.10.5
 six==1.10.0
-setuptools
+setuptools==35.0.0

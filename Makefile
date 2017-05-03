@@ -33,6 +33,7 @@ python:
 # Install protoc v3
 protoc: /tmp/$(PROTOC_ARCHIVE)
 	unzip /tmp/$(PROTOC_ARCHIVE) -d $(VENDOR_LIB)/protoc3
+	-rm $(VENDOR_BIN)/protoc
 	ln -s $(VENDOR_LIB)/protoc3/bin/protoc $(VENDOR_BIN)/protoc
 	chmod a+r+x $(VENDOR_LIB)/protoc3 -R
 
